@@ -23,6 +23,8 @@
 use anyhow::Result;
 use candle_core::{Module, Tensor};
 use candle_nn::{linear, Linear, VarBuilder};
+use std::collections::HashMap;
+use std::sync::Mutex;
 
 /// A 2-layer MLP matching PyTorch `create_mlp(..., activation="gelu")`.
 /// Sequential indices: 0=Linear, 1=GELU (no params), 2=Dropout (no params), 3=Linear.
@@ -48,6 +50,9 @@ pub struct SpanRepLayer {
     project_end: Mlp,
     out_project: Mlp,
     pub max_width: usize,
+    // Cache of (start_idx, end_idx) tensors per text_len on this device.
+    // Avoids rebuilding index vectors every forward pass.
+    index_cache: Mutex<HashMap<usize, (Tensor, Tensor)>>,
 }
 
 impl SpanRepLayer {
@@ -57,28 +62,42 @@ impl SpanRepLayer {
         let project_end   = Mlp::load(hidden_size, hidden_size * 4, hidden_size, vb.pp("project_end"))?;
         // out_project takes concat(start_proj, end_proj) = 2*hidden → 4*hidden → hidden
         let out_project   = Mlp::load(hidden_size * 2, hidden_size * 4, hidden_size, vb.pp("out_project"))?;
-        Ok(Self { project_start, project_end, out_project, max_width })
+        Ok(Self {
+            project_start,
+            project_end,
+            out_project,
+            max_width,
+            index_cache: Mutex::new(HashMap::new()),
+        })
     }
 
     /// token_emb: (text_len, hidden_size)
     /// Returns:   (text_len, max_width, hidden_size)
     pub fn forward(&self, token_emb: &Tensor) -> Result<Tensor> {
         let (text_len, hidden) = token_emb.dims2()?;
-        let n_spans = text_len * self.max_width;
         let device = token_emb.device();
 
-        // Build flat index arrays for start and (clamped) end positions
-        let mut start_idx: Vec<u32> = Vec::with_capacity(n_spans);
-        let mut end_idx:   Vec<u32> = Vec::with_capacity(n_spans);
-        for i in 0..text_len {
-            for w in 0..self.max_width {
-                start_idx.push(i as u32);
-                end_idx.push((i + w).min(text_len - 1) as u32);
+        // Reuse cached index tensors if available.
+        let (start_t, end_t) = {
+            let mut cache = self.index_cache.lock().unwrap();
+            if let Some((s, e)) = cache.get(&text_len) {
+                (s.clone(), e.clone())
+            } else {
+                let n_spans = text_len * self.max_width;
+                let mut start_idx: Vec<u32> = Vec::with_capacity(n_spans);
+                let mut end_idx: Vec<u32> = Vec::with_capacity(n_spans);
+                for i in 0..text_len {
+                    for w in 0..self.max_width {
+                        start_idx.push(i as u32);
+                        end_idx.push((i + w).min(text_len - 1) as u32);
+                    }
+                }
+                let start_t = Tensor::from_vec(start_idx, (n_spans,), device)?;
+                let end_t = Tensor::from_vec(end_idx, (n_spans,), device)?;
+                cache.insert(text_len, (start_t.clone(), end_t.clone()));
+                (start_t, end_t)
             }
-        }
-
-        let start_t = Tensor::from_vec(start_idx, (n_spans,), device)?;
-        let end_t   = Tensor::from_vec(end_idx,   (n_spans,), device)?;
+        };
 
         // Gather: (n_spans, hidden)
         let start_emb = token_emb.index_select(&start_t, 0)?;
