@@ -1,0 +1,37 @@
+[package]
+name = "gliner2-candle"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "gliner2-candle"
+path = "src/main.rs"
+
+[dependencies]
+# Candle ML framework — pure Rust, no C++ runtime
+candle-core = "0.9.2"
+candle-nn = "0.9.2"
+candle-transformers = "0.9.2"
+
+# HuggingFace tokenizers (same crate HF uses in Python)
+tokenizers = { version = "0.21", features = ["http"] }
+
+# HuggingFace Hub for downloading model weights & configs
+hf-hub = "0.3"
+
+# Error handling
+anyhow = "1"
+
+# Serialization (model configs are JSON)
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+# CLI
+clap = { version = "4", features = ["derive"] }
+
+# Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# ~ expansion for --model-dir paths
+shellexpand = "3"
