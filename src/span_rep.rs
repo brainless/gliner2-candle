@@ -39,7 +39,7 @@ impl Mlp {
     }
 
     fn forward(&self, x: &Tensor) -> Result<Tensor> {
-        Ok(self.fc2.forward(&self.fc1.forward(x)?.gelu()?)?)
+        Ok(self.fc2.forward(&self.fc1.forward(x)?.relu()?)?)
     }
 }
 
@@ -88,9 +88,11 @@ impl SpanRepLayer {
         let start_proj = self.project_start.forward(&start_emb)?; // (n_spans, hidden)
         let end_proj   = self.project_end.forward(&end_emb)?;     // (n_spans, hidden)
 
-        // Concatenate and apply output projection
-        let combined = Tensor::cat(&[&start_proj, &end_proj], 1)?; // (n_spans, 2*hidden)
-        let projected = self.out_project.forward(&combined)?;       // (n_spans, hidden)
+        // Concatenate, apply ReLU, then out_project.
+        // Python: cat = torch.cat([start_span_rep, end_span_rep], dim=-1).relu()
+        //         return self.out_project(cat)
+        let combined = Tensor::cat(&[&start_proj, &end_proj], 1)?.relu()?; // (n_spans, 2*hidden)
+        let projected = self.out_project.forward(&combined)?;                // (n_spans, hidden)
 
         // Reshape to (text_len, max_width, hidden)
         Ok(projected.reshape((text_len, self.max_width, hidden))?)

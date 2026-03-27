@@ -207,19 +207,9 @@ impl GLiNER2 {
         // struct_proj: (B, P, D) → (B*P, D) → (D, B*P)
         let proj_flat = struct_proj.reshape((b * p, d))?.t()?;
 
-        // L2 normalize vectors before dot product for stable scores
-        let span_norms = span_flat.sqr()?.sum_keepdim(1)?.sqrt()?;
-        let span_flat = span_flat.broadcast_div(&span_norms)?;
-
-        let proj_norms = proj_flat.sqr()?.sum_keepdim(0)?.sqrt()?;
-        let proj_flat = proj_flat.broadcast_div(&proj_norms)?;
-
-        // (L*K, D) @ (D, B*P) → (L*K, B*P)
+        // Raw dot product: (L*K, D) @ (D, B*P) → (L*K, B*P)
+        // Matches Python: torch.einsum('lkd,bpd->bplk', span_rep, struct_proj)
         let scores_flat = span_flat.matmul(&proj_flat)?;
-
-        // Scale by sqrt(hidden_dim) to match typical attention magnitude
-        let scale = (d as f32).sqrt();
-        let scores_flat = scores_flat.broadcast_mul(&Tensor::new(scale, scores_flat.device())?)?;
 
         // (L*K, B*P) → (L, K, B, P) → (B, P, L, K)
         let scores = scores_flat.reshape((l, k, b, p))?.permute((2, 3, 0, 1))?;

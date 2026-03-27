@@ -6,7 +6,7 @@
 ///   3. Greedy overlap removal (highest confidence first)
 ///   4. Map word-span → character offsets
 use anyhow::Result;
-use candle_core::Tensor;
+use candle_core::{IndexOp, Tensor};
 use candle_nn::ops::sigmoid;
 
 use crate::processor::ProcessedInput;
@@ -38,8 +38,10 @@ pub fn extract_entities(
     // sigmoid in-place
     let probs = sigmoid(scores)?;
 
-    // Aggregate over count dim (dim 0): max over count steps → (num_types, text_len, max_width)
-    let probs = probs.max(0)?;
+    // Use count step 0 only, matching Python's _extract_entities which does
+    // span_scores[0, :, ...].  For entity extraction gold_count is trained as 1,
+    // so step 0 carries all the entity-level scores.
+    let probs = probs.i(0)?; // (num_types, text_len, max_width)
 
     let (num_types, text_len, max_width) = probs.dims3()?;
     let probs_vec = probs.to_vec3::<f32>()?;

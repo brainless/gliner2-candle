@@ -122,7 +122,8 @@ impl Preprocessor {
 
         input_ids.push(self.rp_id); // ")"
         input_ids.push(self.rp_id); // ")"
-        input_ids.push(self.sep_struct_id); // [SEP_STRUCT]
+        // Note: Python pops the trailing [SEP_STRUCT] for single-schema inputs,
+        // so no [SEP_STRUCT] is added here for the entity extraction case.
 
         // ── [SEP_TEXT] separator ──────────────────────────────────────────────
         let sep_text_pos = input_ids.len();
@@ -135,9 +136,11 @@ impl Preprocessor {
 
         for word in &words {
             word_token_indices.push(input_ids.len());
+            // Lowercase to match Python's word_splitter(text, lower=True) behaviour.
+            let word_lower = word.to_lowercase();
             let enc = self
                 .tokenizer
-                .encode(word.as_str(), false)
+                .encode(word_lower.as_str(), false)
                 .map_err(|e| anyhow!("{e}"))?;
             let ids = enc.get_ids();
             if ids.is_empty() {
@@ -166,35 +169,53 @@ impl Preprocessor {
     }
 }
 
-/// Split `text` on whitespace, returning (words, char_offsets).
+/// Split `text` into tokens and byte offsets, matching Python's `WhitespaceTokenSplitter`:
+///   - alphanumeric sequences (plus intra-word hyphens/underscores) become word tokens
+///   - every other non-whitespace character becomes its own single-character token
+///
+/// Tokens are stored with their original casing; callers must lowercase before
+/// passing to the tokenizer to match the training-time `lower=True` behaviour.
 fn whitespace_split(text: &str) -> (Vec<String>, Vec<(usize, usize)>) {
     let mut words = Vec::new();
     let mut offsets = Vec::new();
-    let chars: Vec<char> = text.chars().collect();
+    let chars: Vec<(usize, char)> = text.char_indices().collect();
     let mut i = 0;
+
     while i < chars.len() {
-        if chars[i].is_whitespace() {
+        let (start_byte, ch) = chars[i];
+
+        if ch.is_whitespace() {
             i += 1;
-        } else {
-            // Find end of word
-            let word_start_byte = text
-                .char_indices()
-                .nth(i)
-                .map(|(b, _)| b)
-                .unwrap_or(text.len());
+            continue;
+        }
+
+        if ch.is_alphanumeric() || ch == '_' {
+            // Collect a word: alphanumeric/underscore, optionally joined by hyphens.
             let mut j = i + 1;
-            while j < chars.len() && !chars[j].is_whitespace() {
-                j += 1;
+            while j < chars.len() {
+                let c = chars[j].1;
+                if c.is_alphanumeric() || c == '_' {
+                    j += 1;
+                } else if c == '-' && j + 1 < chars.len() && chars[j + 1].1.is_alphanumeric() {
+                    // Intra-word hyphen (e.g. "well-known") — consume hyphen + next char.
+                    j += 2;
+                } else {
+                    break;
+                }
             }
-            let word_end_byte = text
-                .char_indices()
-                .nth(j)
-                .map(|(b, _)| b)
-                .unwrap_or(text.len());
-            words.push(text[word_start_byte..word_end_byte].to_string());
-            offsets.push((word_start_byte, word_end_byte));
+            let end_byte = chars.get(j).map(|(b, _)| *b).unwrap_or(text.len());
+            words.push(text[start_byte..end_byte].to_string());
+            offsets.push((start_byte, end_byte));
             i = j;
+        } else {
+            // Non-whitespace, non-alphanumeric: emit as a single-character token
+            // (punctuation, symbols, etc.).
+            let end_byte = chars.get(i + 1).map(|(b, _)| *b).unwrap_or(text.len());
+            words.push(ch.to_string());
+            offsets.push((start_byte, end_byte));
+            i += 1;
         }
     }
+
     (words, offsets)
 }
