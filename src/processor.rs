@@ -20,6 +20,7 @@ pub struct ProcessedInput {
     pub attention_mask: Vec<u32>,
 
     /// Token-sequence position of the [SEP_TEXT] token.
+    #[allow(dead_code)] // used by boundary routing (epic Task 4)
     pub sep_text_pos: usize,
 
     /// Position of the [P] token (for count prediction).
@@ -47,6 +48,7 @@ pub struct Preprocessor {
     tokenizer: Tokenizer,
     p_id: u32,
     e_id: u32,
+    #[allow(dead_code)] // used by boundary routing (epic Task 4)
     sep_struct_id: u32,
     sep_text_id: u32,
     lp_id: u32, // "("
@@ -122,8 +124,8 @@ impl Preprocessor {
 
         input_ids.push(self.rp_id); // ")"
         input_ids.push(self.rp_id); // ")"
-        // Note: Python pops the trailing [SEP_STRUCT] for single-schema inputs,
-        // so no [SEP_STRUCT] is added here for the entity extraction case.
+                                    // Note: Python pops the trailing [SEP_STRUCT] for single-schema inputs,
+                                    // so no [SEP_STRUCT] is added here for the entity extraction case.
 
         // ── [SEP_TEXT] separator ──────────────────────────────────────────────
         let sep_text_pos = input_ids.len();

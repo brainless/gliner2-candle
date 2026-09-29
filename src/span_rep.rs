@@ -58,10 +58,25 @@ pub struct SpanRepLayer {
 impl SpanRepLayer {
     pub fn load(hidden_size: usize, max_width: usize, vb: VarBuilder) -> Result<Self> {
         // Each projection: hidden → 4*hidden → hidden
-        let project_start = Mlp::load(hidden_size, hidden_size * 4, hidden_size, vb.pp("project_start"))?;
-        let project_end   = Mlp::load(hidden_size, hidden_size * 4, hidden_size, vb.pp("project_end"))?;
+        let project_start = Mlp::load(
+            hidden_size,
+            hidden_size * 4,
+            hidden_size,
+            vb.pp("project_start"),
+        )?;
+        let project_end = Mlp::load(
+            hidden_size,
+            hidden_size * 4,
+            hidden_size,
+            vb.pp("project_end"),
+        )?;
         // out_project takes concat(start_proj, end_proj) = 2*hidden → 4*hidden → hidden
-        let out_project   = Mlp::load(hidden_size * 2, hidden_size * 4, hidden_size, vb.pp("out_project"))?;
+        let out_project = Mlp::load(
+            hidden_size * 2,
+            hidden_size * 4,
+            hidden_size,
+            vb.pp("out_project"),
+        )?;
         Ok(Self {
             project_start,
             project_end,
@@ -101,17 +116,17 @@ impl SpanRepLayer {
 
         // Gather: (n_spans, hidden)
         let start_emb = token_emb.index_select(&start_t, 0)?;
-        let end_emb   = token_emb.index_select(&end_t,   0)?;
+        let end_emb = token_emb.index_select(&end_t, 0)?;
 
         // Project start and end independently
         let start_proj = self.project_start.forward(&start_emb)?; // (n_spans, hidden)
-        let end_proj   = self.project_end.forward(&end_emb)?;     // (n_spans, hidden)
+        let end_proj = self.project_end.forward(&end_emb)?; // (n_spans, hidden)
 
         // Concatenate, apply ReLU, then out_project.
         // Python: cat = torch.cat([start_span_rep, end_span_rep], dim=-1).relu()
         //         return self.out_project(cat)
         let combined = Tensor::cat(&[&start_proj, &end_proj], 1)?.relu()?; // (n_spans, 2*hidden)
-        let projected = self.out_project.forward(&combined)?;                // (n_spans, hidden)
+        let projected = self.out_project.forward(&combined)?; // (n_spans, hidden)
 
         // Reshape to (text_len, max_width, hidden)
         Ok(projected.reshape((text_len, self.max_width, hidden))?)

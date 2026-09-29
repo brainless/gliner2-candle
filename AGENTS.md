@@ -18,11 +18,11 @@ cargo clippy --all-targets
 cargo fmt
 
 # Requires a downloaded model to actually run (not vendored):
-hf download fastino/gliner2-large-v1 --local-dir ./model
-cargo run --release -- --model-dir ./model --text "Apple was founded by Steve Jobs in Cupertino." --entities "person,organization,location"
+hf download fastino/gliner2-large-v1 --local-dir ./models/gliner2-large-v1
+cargo run --release -- --model-dir ./models/gliner2-large-v1 --text "Apple was founded by Steve Jobs in Cupertino." --entities "person,organization,location"
 ```
 
-There is no test suite. Verify changes by running inference against `./model` (download once,
+There is no test suite. Verify changes by running inference against `./models/gliner2-large-v1` (download once,
 reuse across sessions) and checking the extracted spans look correct, not just that the binary
 exits 0.
 
@@ -38,7 +38,7 @@ exits 0.
   `DEVELOP.md` ("Weight key prefixes" / MLP Sequential layout section). Getting the `0`/`3` vs
   `0`/`2` Linear-layer index wrong is a documented past bug class.
 - If you change how weights are loaded or renamed, verify with
-  `cargo run -- --model-dir ./model --list-weights 50` before assuming the mapping still holds.
+  `cargo run -- --model-dir ./models/gliner2-large-v1 --list-weights 50` before assuming the mapping still holds.
 - `clf1`/`clf2` (binary span classifier) is loaded but intentionally not wired into scoring —
   don't wire it in as a "fix" unless the task specifically asks for it.
 - Known incomplete areas (see DEVELOP.md "Known limitations"): only entity extraction is

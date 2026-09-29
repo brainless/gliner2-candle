@@ -1,11 +1,13 @@
 /target
 **/*.rs.bk
+__pycache__/
+*.pyc
 Cargo.lock
 *.swp
 *.swo
 *~
 .DS_Store
-model/
+models/
 .vscode/
 .idea/
 *.iml

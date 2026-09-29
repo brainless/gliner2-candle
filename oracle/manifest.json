@@ -1,0 +1,494 @@
+{
+ "purpose": "Python behavioral oracle for epic gliner-2.5-boundary-support Tasks 2 and 5",
+ "gliner2_reference": {
+  "path": "/Users/brainless/Projects/GLiNER2",
+  "commit": "55656fbfa01d3d4a77485e1a1eeeaf682990ccdf"
+ },
+ "checkpoint": {
+  "local_dir": "models/gliner2.5-small-v1",
+  "hub_id": "fastino/gliner2.5-small-v1",
+  "hub_revision": "7132dc4561c3f94563c6147e75ffa8ef34c4964a",
+  "weights": "model.safetensors (single file, 334 tensors, not captured)"
+ },
+ "environment": {
+  "python": "3.12.13",
+  "platform": "macOS-15.3.1-arm64-arm-64bit",
+  "torch": "2.14.0",
+  "transformers": "4.57.6"
+ },
+ "capture_settings": {
+  "eval_mode": true,
+  "threshold": 0.5,
+  "type_order": "declared list order (fixed)",
+  "include_confidence": true,
+  "include_spans": true,
+  "api": "GLiNER2.extract() -> batch_extract() (production path)"
+ },
+ "config": {
+  "raw_config": {
+   "architecture": "boundary",
+   "architecture_version": 1,
+   "architectures": [
+    "BoundaryExtractor"
+   ],
+   "attn_implementation": "sdpa",
+   "boundary_head": {
+    "abstention_loss_weight": 0.2,
+    "abstention_threshold": 0.5,
+    "adaptive_threshold": false,
+    "bidirectional_proposals": true,
+    "boundary_attention_heads": 4,
+    "boundary_attention_layers": 2,
+    "boundary_attention_window": 128,
+    "boundary_dim": 128,
+    "boundary_ffn_multiplier": 2.0,
+    "boundary_focal_clip": 0.05,
+    "boundary_focal_gamma_negative": 2.0,
+    "boundary_focal_gamma_positive": 0.0,
+    "boundary_marginal_loss": "asymmetric_focal",
+    "boundary_negative_weight": 0.5,
+    "boundary_refinement_layers": 1,
+    "boundary_top_k_alpha": 0.08,
+    "boundary_top_k_bucket": 8,
+    "boundary_top_k_max": 128,
+    "candidate_attention_heads": 4,
+    "candidate_attention_layers": 0,
+    "candidate_budget": 192,
+    "candidate_pool": "shared",
+    "classification_loss_weight": 1.0,
+    "classification_temperature": 1.0,
+    "consistency_loss_weight": 0.1,
+    "consistency_warmup_steps": 2000,
+    "content_dim": 64,
+    "content_soft_max_pool": false,
+    "count_loss_weight": 0.2,
+    "directional_relation_states": true,
+    "dropout": 0.1,
+    "enable_abstention": true,
+    "enable_count_head": true,
+    "enable_records": true,
+    "enable_relations": true,
+    "enable_rotary_endpoints": true,
+    "enable_span_content": true,
+    "end_block_size": 256,
+    "end_top_k": 24,
+    "endpoint_difference_features": true,
+    "ends_per_start": 12,
+    "export_mode": "auto",
+    "hard_negative_keep_all_when_absent": true,
+    "hard_negatives_per_positive": 20,
+    "loss_reduction": "sum",
+    "max_gold_per_query": 64,
+    "max_negative_queries_per_batch": 64,
+    "min_pool_per_query": 8,
+    "minimum_hard_negatives": 16,
+    "multihead_pair_compat_heads": 8,
+    "negative_query_ratio": 1.0,
+    "overlap_policy": "flat",
+    "pair_dim": 128,
+    "pair_temperature": 1.0,
+    "pool_boundary_top_k": 32,
+    "pool_size": 192,
+    "proposal_loss_weight": 0.3,
+    "query_attention_layers": 0,
+    "query_conditioned_inside_weight": true,
+    "record_anchor_proposal_threshold": 0.2,
+    "record_anchor_threshold": 0.5,
+    "record_dim": 128,
+    "record_field_threshold": 0.5,
+    "record_instance_queries": 32,
+    "record_loss_weight": 1.0,
+    "record_temperature": 1.0,
+    "relation_argument_proposal_threshold": 0.2,
+    "relation_biaffine_content": true,
+    "relation_heads_per_type": 32,
+    "relation_loss_weight": 1.0,
+    "relation_pair_cap": 64,
+    "relation_tails_per_type": 32,
+    "relation_temperature": 1.0,
+    "rerank_listwise_weight": 0.3,
+    "reranker_endpoint_compat": true,
+    "rotary_base": 10000.0,
+    "soft_iou_anneal_steps": 20000,
+    "soft_iou_aux_weight": 0.2,
+    "start_top_k": 24,
+    "starts_per_end": 12,
+    "training_candidate_budget": 192,
+    "use_inside_evidence": true,
+    "vectorized_pair_elements": 16777216
+   },
+   "config_version": 3,
+   "max_len": 4096,
+   "model_name": "microsoft/deberta-v3-xsmall",
+   "model_type": "extractor",
+   "token_pooling": "first",
+   "transformers_version": "5.8.0"
+  },
+  "migrated_boundary_settings": {
+   "boundary_dim": 128,
+   "pair_dim": 128,
+   "boundary_refinement_layers": 1,
+   "boundary_ffn_multiplier": 2.0,
+   "start_top_k": 24,
+   "end_top_k": 24,
+   "ends_per_start": 12,
+   "starts_per_end": 12,
+   "candidate_budget": 192,
+   "training_candidate_budget": 192,
+   "max_gold_per_query": 64,
+   "end_block_size": 256,
+   "bidirectional_proposals": true,
+   "use_inside_evidence": true,
+   "dropout": 0.1,
+   "export_mode": "auto",
+   "vectorized_pair_elements": 16777216,
+   "boundary_negative_weight": 0.5,
+   "boundary_marginal_loss": "asymmetric_focal",
+   "loss_reduction": "sum",
+   "boundary_focal_gamma_positive": 0.0,
+   "boundary_focal_gamma_negative": 2.0,
+   "boundary_focal_clip": 0.05,
+   "hard_negatives_per_positive": 20,
+   "minimum_hard_negatives": 16,
+   "hard_negative_keep_all_when_absent": true,
+   "enable_span_content": true,
+   "content_dim": 64,
+   "content_soft_max_pool": false,
+   "enable_rotary_endpoints": true,
+   "rotary_base": 10000.0,
+   "boundary_attention_layers": 2,
+   "boundary_attention_heads": 4,
+   "boundary_attention_window": 128,
+   "query_conditioned_inside_weight": true,
+   "endpoint_difference_features": true,
+   "reranker_endpoint_compat": true,
+   "multihead_pair_compat_heads": 8,
+   "boundary_top_k_alpha": 0.08,
+   "boundary_top_k_max": 128,
+   "boundary_top_k_bucket": 8,
+   "candidate_pool": "shared",
+   "pool_boundary_top_k": 32,
+   "pool_size": 192,
+   "min_pool_per_query": 8,
+   "candidate_attention_layers": 0,
+   "candidate_attention_heads": 4,
+   "query_attention_layers": 0,
+   "enable_abstention": true,
+   "abstention_threshold": 0.5,
+   "proposal_loss_weight": 0.3,
+   "consistency_loss_weight": 0.1,
+   "rerank_listwise_weight": 0.3,
+   "soft_iou_aux_weight": 0.2,
+   "soft_iou_anneal_steps": 20000,
+   "abstention_loss_weight": 0.2,
+   "consistency_warmup_steps": 2000,
+   "enable_count_head": true,
+   "count_loss_weight": 0.2,
+   "adaptive_threshold": false,
+   "overlap_policy": "flat",
+   "pair_temperature": 1.0,
+   "relation_temperature": 1.0,
+   "record_temperature": 1.0,
+   "classification_temperature": 1.0,
+   "negative_query_ratio": 1.0,
+   "max_negative_queries_per_batch": 64,
+   "classification_loss_weight": 1.0,
+   "enable_records": true,
+   "record_dim": 128,
+   "record_instance_queries": 32,
+   "record_anchor_proposal_threshold": 0.2,
+   "record_anchor_threshold": 0.5,
+   "record_field_threshold": 0.5,
+   "record_loss_weight": 1.0,
+   "enable_relations": true,
+   "relation_heads_per_type": 32,
+   "relation_tails_per_type": 32,
+   "relation_pair_cap": 64,
+   "relation_loss_weight": 1.0,
+   "relation_argument_proposal_threshold": 0.2,
+   "directional_relation_states": true,
+   "relation_biaffine_content": true
+  },
+  "enable_relations": true,
+  "enable_records": true,
+  "candidate_pool": "shared"
+ },
+ "conventions": {
+  "offsets": "Python str indices = Unicode code points; half-open [start,end); they index normalized_text (= input text plus synthetic '.' when the input does not end with '.', '!' or '?'; '' becomes '.')",
+  "split_word_offsets": "word_char_spans[i] slices words[i] out of normalized_text (case-folded equality)",
+  "word_index_space": "candidate/argument indices are half-open [start,end) word boundaries on the text-word axis (including any classification prefix; word_offset shifts to document words)",
+  "candidate_pool": "shared: selected_candidate_indices are query-agnostic pool rows [start,end), common to all queries; candidate_pair_logits is [Q][C] raw (pre pair_temperature) logit of each pool row per query",
+  "relation_argument_selection": "sigmoid(candidate_pair_logits) WITHOUT pair_temperature, gated by relation_argument_proposal_threshold",
+  "relation_logits": "raw SparseRelationScorer logits per proposed pair (aligned with proposed_argument_pairs); relation_temperature applied later, at decode",
+  "marker_token_ids": {
+   "[E]": 128005,
+   "[R]": 128006,
+   "[P]": 128003,
+   "[SEP_STRUCT]": 128001,
+   "[SEP_TEXT]": 128002
+  },
+  "floats": "full Python float64 repr of the fp32 model values; compare with tolerance ~1e-5",
+  "raw_intermediates": "Task 5 cases 01/05/10 carry raw_boundary (boundary states + mask, start/end/inside logits, inside_prefix, inside_prefix_mean, interval rows [batch,query,start,end,value]); case 01 additionally carries the after_layer_norm / after_attention_0 stages and raw_core (gathered text_states / query_states); synthetic_masks.json holds a padded B=2 batch (mask/window/EOS-at-n_b; inputs via the recorded fp32 lattice formula)",
+  "not_captured": "weights, candidate-state tensors, relation query-state vectors (shapes only), raw marginals outside cases 01/05/10 (shapes only)"
+ },
+ "cases": [
+  {
+   "case_id": "01_apple_readme",
+   "file": "cases/01_apple_readme.json",
+   "task": "entities",
+   "text": "Apple was founded by Steve Jobs in Cupertino.",
+   "entity_types": [
+    "person",
+    "organization",
+    "location"
+   ],
+   "relation_types": [],
+   "entities_extracted": 3,
+   "edges_extracted": 0,
+   "sanity_checks": 47
+  },
+  {
+   "case_id": "02_adjacent_entities",
+   "file": "cases/02_adjacent_entities.json",
+   "task": "entities",
+   "text": "John Smith Jane Doe founded Acme Corp.",
+   "entity_types": [
+    "person",
+    "organization"
+   ],
+   "relation_types": [],
+   "entities_extracted": 3,
+   "edges_extracted": 0,
+   "sanity_checks": 30
+  },
+  {
+   "case_id": "03_punctuation",
+   "file": "cases/03_punctuation.json",
+   "task": "entities",
+   "text": "Steve Jobs' Apple, Inc. is in Cupertino, CA.",
+   "entity_types": [
+    "person",
+    "organization",
+    "location"
+   ],
+   "relation_types": [],
+   "entities_extracted": 3,
+   "edges_extracted": 0,
+   "sanity_checks": 28
+  },
+  {
+   "case_id": "04_multiword_entity",
+   "file": "cases/04_multiword_entity.json",
+   "task": "entities",
+   "text": "Barack Obama visited New York City last year.",
+   "entity_types": [
+    "person",
+    "location"
+   ],
+   "relation_types": [],
+   "entities_extracted": 2,
+   "edges_extracted": 0,
+   "sanity_checks": 24
+  },
+  {
+   "case_id": "05_edges",
+   "file": "cases/05_edges.json",
+   "task": "entities",
+   "text": "Alice greeted Bob",
+   "entity_types": [
+    "person"
+   ],
+   "relation_types": [],
+   "entities_extracted": 2,
+   "edges_extracted": 0,
+   "sanity_checks": 35
+  },
+  {
+   "case_id": "06_no_terminal_punct",
+   "file": "cases/06_no_terminal_punct.json",
+   "task": "entities",
+   "text": "Apple was founded by Steve Jobs in Cupertino",
+   "entity_types": [
+    "person",
+    "organization",
+    "location"
+   ],
+   "relation_types": [],
+   "entities_extracted": 3,
+   "edges_extracted": 0,
+   "sanity_checks": 28
+  },
+  {
+   "case_id": "07_url_email",
+   "file": "cases/07_url_email.json",
+   "task": "entities",
+   "text": "Email bob@example.com or see https://example.com/about; ask Alice.",
+   "entity_types": [
+    "person",
+    "email",
+    "url"
+   ],
+   "relation_types": [],
+   "entities_extracted": 3,
+   "edges_extracted": 0,
+   "sanity_checks": 28
+  },
+  {
+   "case_id": "08_unicode",
+   "file": "cases/08_unicode.json",
+   "task": "entities",
+   "text": "Renée Müller met 田中太郎 in São Paulo.",
+   "entity_types": [
+    "person",
+    "location"
+   ],
+   "relation_types": [],
+   "entities_extracted": 3,
+   "edges_extracted": 0,
+   "sanity_checks": 28
+  },
+  {
+   "case_id": "09_overlap",
+   "file": "cases/09_overlap.json",
+   "task": "entities",
+   "text": "John Smith visited New York City.",
+   "entity_types": [
+    "person",
+    "location"
+   ],
+   "relation_types": [],
+   "entities_extracted": 2,
+   "edges_extracted": 0,
+   "sanity_checks": 24
+  },
+  {
+   "case_id": "10_empty_text",
+   "file": "cases/10_empty_text.json",
+   "task": "entities",
+   "text": "",
+   "entity_types": [
+    "person",
+    "organization",
+    "location"
+   ],
+   "relation_types": [],
+   "entities_extracted": 0,
+   "edges_extracted": 0,
+   "sanity_checks": 30
+  },
+  {
+   "case_id": "11_truncated_text",
+   "file": "cases/11_truncated_text.json",
+   "task": "entities",
+   "text": "Apple was founded by Steve Jo",
+   "entity_types": [
+    "person",
+    "organization"
+   ],
+   "relation_types": [],
+   "entities_extracted": 2,
+   "edges_extracted": 0,
+   "sanity_checks": 25
+  },
+  {
+   "case_id": "12_relation_only",
+   "file": "cases/12_relation_only.json",
+   "task": "relations",
+   "text": "Steve Jobs founded Apple in Cupertino.",
+   "entity_types": [],
+   "relation_types": [
+    "founder"
+   ],
+   "entities_extracted": 0,
+   "edges_extracted": 1,
+   "sanity_checks": 26
+  },
+  {
+   "case_id": "13_combined",
+   "file": "cases/13_combined.json",
+   "task": "entities+relations",
+   "text": "Steve Jobs founded Apple in Cupertino.",
+   "entity_types": [
+    "person",
+    "organization",
+    "location"
+   ],
+   "relation_types": [
+    "founder"
+   ],
+   "entities_extracted": 3,
+   "edges_extracted": 1,
+   "sanity_checks": 36
+  },
+  {
+   "case_id": "14_direction_fwd",
+   "file": "cases/14_direction_fwd.json",
+   "task": "relations",
+   "text": "Steve Jobs founded Apple.",
+   "entity_types": [],
+   "relation_types": [
+    "founder"
+   ],
+   "entities_extracted": 0,
+   "edges_extracted": 1,
+   "sanity_checks": 24
+  },
+  {
+   "case_id": "15_direction_rev",
+   "file": "cases/15_direction_rev.json",
+   "task": "relations",
+   "text": "Apple was founded by Steve Jobs.",
+   "entity_types": [],
+   "relation_types": [
+    "founder"
+   ],
+   "entities_extracted": 0,
+   "edges_extracted": 1,
+   "sanity_checks": 24
+  },
+  {
+   "case_id": "16_duplicate_mentions",
+   "file": "cases/16_duplicate_mentions.json",
+   "task": "relations",
+   "text": "Steve Jobs founded Apple. Later, Steve Jobs returned to Apple.",
+   "entity_types": [],
+   "relation_types": [
+    "founder"
+   ],
+   "entities_extracted": 0,
+   "edges_extracted": 1,
+   "sanity_checks": 40
+  },
+  {
+   "case_id": "17_no_relation",
+   "file": "cases/17_no_relation.json",
+   "task": "relations",
+   "text": "Alice visited Paris.",
+   "entity_types": [],
+   "relation_types": [
+    "founder"
+   ],
+   "entities_extracted": 0,
+   "edges_extracted": 1,
+   "sanity_checks": 24
+  },
+  {
+   "case_id": "18_multi_type_combined",
+   "file": "cases/18_multi_type_combined.json",
+   "task": "entities+relations",
+   "text": "Apple is headquartered in Cupertino and was founded by Steve Jobs.",
+   "entity_types": [
+    "person",
+    "organization",
+    "location"
+   ],
+   "relation_types": [
+    "founder",
+    "headquartered_in"
+   ],
+   "entities_extracted": 3,
+   "edges_extracted": 2,
+   "sanity_checks": 44
+  }
+ ]
+}

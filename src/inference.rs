@@ -30,6 +30,8 @@ pub struct ExtractedEntity {
 /// gold_count dimension by taking the max score across count steps — this
 /// produces a single confidence per span, matching inference behaviour in
 /// Python's `engine.py`.
+/// greedy scoring loops index `probs_vec[t][s][w]` deliberately
+#[allow(clippy::needless_range_loop)]
 pub fn extract_entities(
     scores: &Tensor,
     input: &ProcessedInput,

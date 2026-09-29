@@ -1,0 +1,377 @@
+{
+  "version": 1,
+  "model_id": "fastino/gliner2.5-small-v1",
+  "cases": [
+    {
+      "name": "readme-entities",
+      "text": "Apple was founded by Steve Jobs in Cupertino.",
+      "entities": [
+        "person",
+        "organization",
+        "location"
+      ],
+      "threshold": 0.5,
+      "expect_entities": [
+        {
+          "type": "person",
+          "text": "Steve Jobs",
+          "byte_start": 21,
+          "byte_end": 31,
+          "confidence": {
+            "min": 0.9,
+            "max": 1.0
+          }
+        },
+        {
+          "type": "organization",
+          "text": "Apple",
+          "byte_start": 0,
+          "byte_end": 5,
+          "confidence": {
+            "min": 0.9,
+            "max": 1.0
+          }
+        },
+        {
+          "type": "location",
+          "text": "Cupertino",
+          "byte_start": 35,
+          "byte_end": 44,
+          "confidence": {
+            "min": 0.9,
+            "max": 1.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "adjacent-entities",
+      "text": "John Smith Jane Doe founded Acme Corp.",
+      "entities": [
+        "person",
+        "organization"
+      ],
+      "threshold": 0.5,
+      "expect_entities": [
+        {
+          "type": "person",
+          "text": "Jane Doe",
+          "byte_start": 11,
+          "byte_end": 19,
+          "confidence": {
+            "min": 0.773,
+            "max": 0.873
+          }
+        },
+        {
+          "type": "person",
+          "text": "John Smith",
+          "byte_start": 0,
+          "byte_end": 10,
+          "confidence": {
+            "min": 0.661,
+            "max": 0.761
+          }
+        },
+        {
+          "type": "organization",
+          "text": "Acme Corp",
+          "byte_start": 28,
+          "byte_end": 37,
+          "confidence": {
+            "min": 0.923,
+            "max": 1.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "combined-founder",
+      "text": "Steve Jobs founded Apple in Cupertino.",
+      "entities": [
+        "person",
+        "organization",
+        "location"
+      ],
+      "relations": [
+        "founder"
+      ],
+      "threshold": 0.5,
+      "expect_entities": [
+        {
+          "type": "person",
+          "text": "Steve Jobs",
+          "byte_start": 0,
+          "byte_end": 10,
+          "confidence": {
+            "min": 0.9,
+            "max": 1.0
+          }
+        },
+        {
+          "type": "organization",
+          "text": "Apple",
+          "byte_start": 19,
+          "byte_end": 24,
+          "confidence": {
+            "min": 0.9,
+            "max": 1.0
+          }
+        },
+        {
+          "type": "location",
+          "text": "Cupertino",
+          "byte_start": 28,
+          "byte_end": 37,
+          "confidence": {
+            "min": 0.9,
+            "max": 1.0
+          }
+        }
+      ],
+      "expect_relations": [
+        {
+          "type": "founder",
+          "head": {
+            "text": "Steve Jobs",
+            "byte_start": 0,
+            "byte_end": 10
+          },
+          "tail": {
+            "text": "Apple",
+            "byte_start": 19,
+            "byte_end": 24
+          },
+          "confidence": {
+            "min": 0.85,
+            "max": 0.95
+          }
+        }
+      ]
+    },
+    {
+      "name": "relation-only-forward",
+      "text": "Steve Jobs founded Apple.",
+      "relations": [
+        "founder"
+      ],
+      "threshold": 0.5,
+      "expect_relations": [
+        {
+          "type": "founder",
+          "head": {
+            "text": "Steve Jobs",
+            "byte_start": 0,
+            "byte_end": 10
+          },
+          "tail": {
+            "text": "Apple",
+            "byte_start": 19,
+            "byte_end": 24
+          },
+          "confidence": {
+            "min": 0.85,
+            "max": 0.98
+          }
+        }
+      ]
+    },
+    {
+      "name": "relation-head-after-tail",
+      "text": "Apple was founded by Steve Jobs.",
+      "relations": [
+        "founder"
+      ],
+      "threshold": 0.5,
+      "expect_relations": [
+        {
+          "type": "founder",
+          "head": {
+            "text": "Steve Jobs",
+            "byte_start": 21,
+            "byte_end": 31
+          },
+          "tail": {
+            "text": "Apple",
+            "byte_start": 0,
+            "byte_end": 5
+          },
+          "confidence": {
+            "min": 0.65,
+            "max": 0.8
+          }
+        }
+      ]
+    },
+    {
+      "name": "unicode-byte-offsets",
+      "text": "Renée Müller met 田中太郎 in São Paulo.",
+      "entities": [
+        "person",
+        "location"
+      ],
+      "threshold": 0.5,
+      "expect_entities": [
+        {
+          "type": "person",
+          "text": "田中太郎",
+          "byte_start": 19,
+          "byte_end": 31,
+          "confidence": {
+            "min": 0.9,
+            "max": 1.0
+          }
+        },
+        {
+          "type": "person",
+          "text": "Renée Müller",
+          "byte_start": 0,
+          "byte_end": 14,
+          "confidence": {
+            "min": 0.9,
+            "max": 1.0
+          }
+        },
+        {
+          "type": "location",
+          "text": "São Paulo",
+          "byte_start": 35,
+          "byte_end": 45,
+          "confidence": {
+            "min": 0.9,
+            "max": 1.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "multi-type-combined",
+      "text": "Apple is headquartered in Cupertino and was founded by Steve Jobs.",
+      "entities": [
+        "person",
+        "organization",
+        "location"
+      ],
+      "relations": [
+        "founder",
+        "headquartered_in"
+      ],
+      "threshold": 0.5,
+      "expect_entities": [
+        {
+          "type": "person",
+          "text": "Steve Jobs",
+          "byte_start": 55,
+          "byte_end": 65,
+          "confidence": {
+            "min": 0.9,
+            "max": 1.0
+          }
+        },
+        {
+          "type": "organization",
+          "text": "Apple",
+          "byte_start": 0,
+          "byte_end": 5,
+          "confidence": {
+            "min": 0.9,
+            "max": 1.0
+          }
+        },
+        {
+          "type": "location",
+          "text": "Cupertino",
+          "byte_start": 26,
+          "byte_end": 35,
+          "confidence": {
+            "min": 0.9,
+            "max": 1.0
+          }
+        }
+      ],
+      "expect_relations": [
+        {
+          "type": "founder",
+          "head": {
+            "text": "Steve Jobs",
+            "byte_start": 55,
+            "byte_end": 65
+          },
+          "tail": {
+            "text": "Apple",
+            "byte_start": 0,
+            "byte_end": 5
+          },
+          "confidence": {
+            "min": 0.55,
+            "max": 0.75
+          }
+        },
+        {
+          "type": "headquartered_in",
+          "head": {
+            "text": "Apple",
+            "byte_start": 0,
+            "byte_end": 5
+          },
+          "tail": {
+            "text": "Cupertino",
+            "byte_start": 26,
+            "byte_end": 35
+          },
+          "confidence": {
+            "min": 0.55,
+            "max": 0.75
+          }
+        }
+      ]
+    },
+    {
+      "name": "empty-text-negative",
+      "text": "",
+      "entities": [
+        "person",
+        "organization",
+        "location"
+      ],
+      "threshold": 0.5,
+      "expect_entities": []
+    },
+    {
+      "name": "near-threshold-founder",
+      "text": "Alice visited Paris.",
+      "relations": [
+        "founder"
+      ],
+      "threshold": 0.5,
+      "expect_relations": [
+        {
+          "type": "founder",
+          "head": {
+            "text": "Alice",
+            "byte_start": 0,
+            "byte_end": 5
+          },
+          "tail": {
+            "text": "Paris",
+            "byte_start": 14,
+            "byte_end": 19
+          },
+          "confidence": {
+            "min": 0.5,
+            "max": 0.53
+          }
+        }
+      ]
+    },
+    {
+      "name": "founder-flips-above-0.52",
+      "text": "Alice visited Paris.",
+      "relations": [
+        "founder"
+      ],
+      "threshold": 0.52,
+      "expect_relations": []
+    }
+  ]
+}
