@@ -12,7 +12,6 @@ A pure-Rust port of GLiNER2 entity extraction using Candle, targeting the
 
 ```bash
 # Toolchain is pinned to stable via rust-toolchain.toml — no action needed, cargo picks it up.
-# (Other projects on this machine use nightly; that's set globally, this repo intentionally overrides to stable.)
 cargo build --release
 cargo check                 # fast iteration
 cargo clippy --all-targets
